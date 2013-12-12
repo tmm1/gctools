@@ -1,3 +1,4 @@
+#include <time.h>
 #include <sys/time.h>
 #include "ruby/ruby.h"
 #include "ruby/debug.h"
@@ -36,7 +37,7 @@ walltime()
   return ts.tv_sec + ts.tv_nsec * 1e-9;
 }
 
-static char *
+static const char *
 event_flag_name(rb_event_flag_t flag)
 {
   switch (flag) {
