@@ -35,3 +35,34 @@ GCProf.after_gc_hook = proc { |info, start, end_mark, end_sweep|
       info[:immediate_sweep] ? "  +immediate_sweep" : ""
   end
 }
+
+GCProf.after_gc_hook =
+proc{ |info, start, end_mark, end_sweep|
+  if end_sweep
+    # eden_slots = oldgen_slots + remembered_shady_slots + longlived_infant_slots + new_infant_slots + empty_eden_slots
+    # heap_swept_slot = new_infant_slots + empty_eden_slots + empty_moved_tomb_slots
+    eden_slots = GC::INTERNAL_CONSTANTS[:HEAP_OBJ_LIMIT] * end_sweep[:heap_eden_page_length]
+    oldgen_slots = end_sweep[:old_object]
+    remembered_shady_slots = end_sweep[:remembered_shady_object]
+    new_infant_slots = end_sweep[:total_allocated_object] - end_mark[:total_allocated_object]
+    empty_moved_tomb_slots = GC::INTERNAL_CONSTANTS[:HEAP_OBJ_LIMIT] * (end_sweep[:heap_tomb_page_length] - end_mark[:heap_tomb_page_length])
+    empty_eden_slots = end_sweep[:heap_swept_slot] - new_infant_slots - empty_moved_tomb_slots
+    longlived_infant_slots = eden_slots - oldgen_slots - remembered_shady_slots - new_infant_slots - empty_eden_slots
+
+    # total_slots = eden_slots + tomb_slots
+    tomb_slots = GC::INTERNAL_CONSTANTS[:HEAP_OBJ_LIMIT] * end_sweep[:heap_tomb_page_length]
+    total_slots = eden_slots + tomb_slots
+
+    STDERR.printf "[%s in %1.3fs (% 13s)] % 8d slots = old (%4.1f%%) + remembered_shady (%4.1f%%) + longlived_infant (%4.1f%%) + new_infant (%4.1f%%) + empty (%4.1f%%) + tomb (%4.1f%%)\n",
+      info[:major_by] ? 'MAJOR GC' : 'minor gc',
+      end_mark[:time] - start[:time],
+      info.values_at(:major_by, :gc_by).compact.join(","),
+      total_slots,
+      oldgen_slots * 100.0 / total_slots,
+      remembered_shady_slots * 100.0 / total_slots,
+      longlived_infant_slots * 100.0 / total_slots,
+      new_infant_slots * 100.0 / total_slots,
+      empty_eden_slots * 100.0 / total_slots,
+      tomb_slots * 100.0 / total_slots
+  end
+}

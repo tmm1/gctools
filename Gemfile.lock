@@ -15,4 +15,4 @@ PLATFORMS
 
 DEPENDENCIES
   gctools!
-  rake-compiler
+  rake-compiler (~> 0.9)
