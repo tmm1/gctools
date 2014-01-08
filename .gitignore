@@ -1,3 +1,4 @@
 /tmp
-/lib/gcprof.bundle
-/lib/gcprof.so
+/lib/gctools/*.bundle
+/lib/gctools/*.so
+/.bundle

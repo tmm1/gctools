@@ -1,4 +1,4 @@
-require 'gcprof'
+require 'gctools/gcprof'
 
 =begin
 GC::Profiler.enable

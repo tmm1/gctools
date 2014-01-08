@@ -4,7 +4,7 @@ task :default => :test
 # Packaging
 # ==========================================================
 
-GEMSPEC = eval(File.read('gcprof.gemspec'))
+GEMSPEC = eval(File.read('gctools.gemspec'))
 
 require 'rubygems/package_task'
 Gem::PackageTask.new(GEMSPEC) do |pkg|
@@ -16,7 +16,12 @@ end
 
 require 'rake/extensiontask'
 Rake::ExtensionTask.new('gcprof', GEMSPEC) do |ext|
-  ext.ext_dir = 'ext'
+  ext.ext_dir = 'ext/gcprof'
+  ext.lib_dir = 'lib/gctools'
+end
+Rake::ExtensionTask.new('oobgc', GEMSPEC) do |ext|
+  ext.ext_dir = 'ext/oobgc'
+  ext.lib_dir = 'lib/gctools'
 end
 task :build => :compile
 

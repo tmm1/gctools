@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'gcprof'
+require 'gctools/gcprof'
 
 class TestGCProf < Test::Unit::TestCase
   def teardown

@@ -1,6 +1,6 @@
-## gcprof
+## gctools
 
-gc profiler for rgengc in ruby 2.1
+gc profiler/logger and oobgc for rgengc in ruby 2.1
 
 ### design
 
@@ -14,4 +14,4 @@ built on new apis and events offered in ruby 2.1:
 
 ### usage
 
-require 'gcprof/logger'
+require 'gctools/logger'
