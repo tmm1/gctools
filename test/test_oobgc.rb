@@ -5,6 +5,7 @@ require 'json'
 class TestOOBGC < Test::Unit::TestCase
   def setup
     GC::OOB.setup
+    GC::OOB.clear
   end
 
   def test_oob_sweep
@@ -46,6 +47,7 @@ class TestOOBGC < Test::Unit::TestCase
     end
 
     assert_equal oob, GC::OOB.stat(:count)
-    assert_equal 1, GC.count - before - GC::OOB.stat(:major_count) - GC::OOB.stat(:minor_count) - GC::OOB.stat(:sweep_count)
+    assert_equal 1, GC.count - before -
+      GC::OOB.stat(:major_count) - GC::OOB.stat(:minor_count) - GC::OOB.stat(:sweep_count)
   end
 end

@@ -156,7 +156,7 @@ oobgc(VALUE self)
 }
 
 static VALUE
-oobgcstat(VALUE self, VALUE key)
+oobgc_stat(VALUE self, VALUE key)
 {
   if (!_oobgc.installed)
     return Qnil;
@@ -173,13 +173,21 @@ oobgcstat(VALUE self, VALUE key)
     return Qnil;
 }
 
+static VALUE
+oobgc_clear(VALUE self)
+{
+  MEMZERO(&_oobgc.stat, _oobgc.stat, 1);
+  return Qnil;
+}
+
 void
 Init_oobgc()
 {
   mOOB = rb_define_module_under(rb_mGC, "OOB");
   rb_define_singleton_method(mOOB, "setup", install, 0);
   rb_define_singleton_method(mOOB, "run", oobgc, 0);
-  rb_define_singleton_method(mOOB, "stat", oobgcstat, 1);
+  rb_define_singleton_method(mOOB, "stat", oobgc_stat, 1);
+  rb_define_singleton_method(mOOB, "clear", oobgc_clear, 0);
 
 #define S(name) sym_##name = ID2SYM(rb_intern(#name));
   S(total_allocated_object);
