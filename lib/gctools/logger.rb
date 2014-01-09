@@ -5,17 +5,19 @@ GC::Profiler.enable
 at_exit{ GC::Profiler.raw_data.map{ |d| p(d) } }
 =end
 
+=begin
 prev_alloc = GC.stat(:total_allocated_object)
 GCProf.after_gc_hook = proc { |info, start, end_mark, end_sweep|
   before = start
   after = end_sweep || end_mark
 
   if !info[:immediate_sweep] && end_sweep
-    STDERR.printf "[%f:% 4d]                   swept after %1.3fs  swept:% 8d\n",
+    STDERR.printf "[%f:% 4d]                   swept after %1.3fs  swept:% 8d  marked:% 8d\n",
       after[:time],
       after[:count],
       after[:time] - end_mark[:time],
-      after[:heap_swept_slot]
+      after[:heap_swept_slot],
+      marked_num
   else
     type = info[:major_by] ? "MAJOR GC" : "minor gc"
     diff = after[:time] - before[:time]
@@ -35,6 +37,7 @@ GCProf.after_gc_hook = proc { |info, start, end_mark, end_sweep|
       info[:immediate_sweep] ? "  +immediate_sweep" : ""
   end
 }
+=end
 
 GCProf.after_gc_hook =
 proc{ |info, start, end_mark, end_sweep|
@@ -53,7 +56,7 @@ proc{ |info, start, end_mark, end_sweep|
     tomb_slots = GC::INTERNAL_CONSTANTS[:HEAP_OBJ_LIMIT] * end_sweep[:heap_tomb_page_length]
     total_slots = eden_slots + tomb_slots
 
-    STDERR.printf "[%s in %1.3fs (% 13s)] % 8d slots = old (%4.1f%%) + remembered_shady (%4.1f%%) + longlived_infant (%4.1f%%) + new_infant (%4.1f%%) + empty (%4.1f%%) + tomb (%4.1f%%)\n",
+    STDERR.printf "[%s in %1.3fs (% 13s)] % 8d slots = old (%4.1f%%) + remembered_shady (%4.1f%%) + shady (%4.1f%%) + infant (%4.1f%%) + empty (%4.1f%%) + tomb (%4.1f%%)\n",
       info[:major_by] ? 'MAJOR GC' : 'minor gc',
       end_mark[:time] - start[:time],
       info.values_at(:major_by, :gc_by).compact.join(","),
