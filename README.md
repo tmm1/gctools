@@ -26,5 +26,4 @@ require 'gctools/logger'
 require 'gctools/oobgc'
 GC::OOB.run # after every request
 use(GC::OOB::UnicornMiddleware) # in config.ru for unicorn
-use(GC::OOB::PumaMiddleware) # in config.ru for puma
 ```
