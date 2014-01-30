@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gctools (0.2.1)
+    gctools (0.2.2)
 
 GEM
   remote: https://rubygems.org/
