@@ -2,7 +2,7 @@ require 'gctools/oobgc'
 
 module GC
   module OOB
-    class UnicornMiddleware
+    module UnicornMiddleware
       def self.new(app)
         ObjectSpace.each_object(Unicorn::HttpServer) do |s|
           s.extend(self)
