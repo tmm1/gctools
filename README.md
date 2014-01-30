@@ -16,9 +16,13 @@ built on new apis and events offered in ruby 2.1:
 
 #### logger
 
+``` ruby
 require 'gctools/logger'
+```
 
 #### oobgc
 
+``` ruby
 require 'gctools/oobgc'
 GC::OOB.run
+```
