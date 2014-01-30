@@ -24,5 +24,6 @@ require 'gctools/logger'
 
 ``` ruby
 require 'gctools/oobgc'
-GC::OOB.run
+GC::OOB.run # after every request
+use(GC::OOB::UnicornMiddleware) # in config.ru for unicorn
 ```

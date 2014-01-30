@@ -184,6 +184,8 @@ void
 Init_oobgc()
 {
   mOOB = rb_define_module_under(rb_mGC, "OOB");
+  rb_autoload(mOOB, rb_intern_const("UnicornMiddleware"), "gctools/oobgc/unicorn_middleware.rb");
+
   rb_define_singleton_method(mOOB, "setup", install, 0);
   rb_define_singleton_method(mOOB, "run", oobgc, 0);
   rb_define_singleton_method(mOOB, "stat", oobgc_stat, 1);
