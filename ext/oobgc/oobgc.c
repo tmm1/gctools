@@ -1,6 +1,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include "ruby/ruby.h"
+#include "ruby/version.h"
 #include "ruby/intern.h"
 #include "ruby/debug.h"
 
@@ -191,7 +192,11 @@ Init_oobgc()
   rb_define_singleton_method(mOOB, "stat", oobgc_stat, 1);
   rb_define_singleton_method(mOOB, "clear", oobgc_clear, 0);
 
-#define S(name, legacy_name) sym_##name = ID2SYM(rb_intern(#legacy_name));
+#if (RUBY_API_VERSION_MAJOR == 2) && (RUBY_API_VERSION_MINOR == 1)
+  #define S(name, legacy_name) sym_##name = ID2SYM(rb_intern(#legacy_name))
+#else
+  #define S(name, legacy_name) sym_##name = ID2SYM(rb_intern(#name))
+#endif
   S(total_allocated_objects, total_allocated_object);
   S(heap_swept_slots, heap_swept_slot);
   S(heap_tomb_pages, heap_tomb_page_length);

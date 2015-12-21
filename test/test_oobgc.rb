@@ -3,6 +3,8 @@ require 'gctools/oobgc'
 require 'json'
 
 class TestOOBGC < Minitest::Test
+  HEAP_SWEPT_SLOTS_KEY = RUBY_VERSION >= "2.2" ? :heap_swept_slots : :heap_swept_slot
+
   def setup
     GC::OOB.setup
     GC::OOB.clear
@@ -12,9 +14,9 @@ class TestOOBGC < Minitest::Test
     GC.start(immediate_sweep: false)
     assert_equal false, GC.latest_gc_info(:immediate_sweep)
 
-    before = GC.stat(:heap_swept_slot)
+    before = GC.stat(HEAP_SWEPT_SLOTS_KEY)
     assert_equal true, GC::OOB.run
-    assert_operator GC.stat(:heap_swept_slot), :>, before
+    assert_operator GC.stat(HEAP_SWEPT_SLOTS_KEY), :>, before
   end
 
   def test_oob_mark
