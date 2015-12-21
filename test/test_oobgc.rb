@@ -1,8 +1,8 @@
-require 'test/unit'
+require 'minitest/autorun'
 require 'gctools/oobgc'
 require 'json'
 
-class TestOOBGC < Test::Unit::TestCase
+class TestOOBGC < Minitest::Test
   def setup
     GC::OOB.setup
     GC::OOB.clear

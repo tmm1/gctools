@@ -12,4 +12,5 @@ Gem::Specification.new do |s|
   s.files = `git ls-files`.split("\n")
   s.extensions = ['ext/gcprof/extconf.rb', 'ext/oobgc/extconf.rb']
   s.add_development_dependency 'rake-compiler', '~> 0.9'
+  s.add_development_dependency 'minitest', '~> 5.0'
 end

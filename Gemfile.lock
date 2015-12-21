@@ -6,6 +6,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    minitest (5.8.3)
     rake (10.1.0)
     rake-compiler (0.9.2)
       rake
@@ -15,4 +16,5 @@ PLATFORMS
 
 DEPENDENCIES
   gctools!
+  minitest (~> 5.0)
   rake-compiler (~> 0.9)
