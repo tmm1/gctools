@@ -14,8 +14,8 @@ struct {
   size_t heap_obj_limit;
 
   struct {
-    size_t total_allocated_object;
-    size_t heap_tomb_page_length;
+    size_t total_allocated_objects;
+    size_t heap_tomb_pages;
   } start;
 
   struct {
@@ -31,8 +31,8 @@ struct {
 } _oobgc;
 
 static VALUE mOOB;
-static VALUE sym_total_allocated_object, sym_heap_swept_slot, sym_heap_tomb_page_length, sym_heap_final_slot;
-static VALUE sym_old_object, sym_old_object_limit, sym_remembered_shady_object, sym_remembered_shady_object_limit;
+static VALUE sym_total_allocated_objects, sym_heap_swept_slots, sym_heap_tomb_pages, sym_heap_final_slots;
+static VALUE sym_old_objects, sym_old_objects_limit, sym_remembered_wb_unprotected_objects, sym_remembered_wb_unprotected_objects_limit;
 static VALUE sym_major_by, sym_count, sym_major_count, sym_minor_count, sym_sweep_count, minor_gc_args;
 static    ID id_start;
 
@@ -45,8 +45,8 @@ gc_event_i(VALUE tpval, void *data)
   switch (flag) {
     case RUBY_INTERNAL_EVENT_GC_START:
       _oobgc.allocation_limit = 0;
-      _oobgc.start.total_allocated_object = rb_gc_stat(sym_total_allocated_object);
-      _oobgc.start.heap_tomb_page_length = rb_gc_stat(sym_heap_tomb_page_length);
+      _oobgc.start.total_allocated_objects = rb_gc_stat(sym_total_allocated_objects);
+      _oobgc.start.heap_tomb_pages = rb_gc_stat(sym_heap_tomb_pages);
       break;
 
     case RUBY_INTERNAL_EVENT_GC_END_MARK:
@@ -56,10 +56,10 @@ gc_event_i(VALUE tpval, void *data)
     case RUBY_INTERNAL_EVENT_GC_END_SWEEP:
       _oobgc.sweep_needed = 0;
       _oobgc.allocation_limit =
-        _oobgc.start.total_allocated_object +
-        rb_gc_stat(sym_heap_swept_slot) +
-        (rb_gc_stat(sym_heap_tomb_page_length) * _oobgc.heap_obj_limit) -
-        rb_gc_stat(sym_heap_final_slot);
+        _oobgc.start.total_allocated_objects +
+        rb_gc_stat(sym_heap_swept_slots) +
+        (rb_gc_stat(sym_heap_tomb_pages) * _oobgc.heap_obj_limit) -
+        rb_gc_stat(sym_heap_final_slots);
       break;
   }
 }
@@ -106,7 +106,7 @@ gc_start_minor()
 static VALUE
 oobgc(VALUE self)
 {
-  size_t curr = rb_gc_stat(sym_total_allocated_object);
+  size_t curr = rb_gc_stat(sym_total_allocated_objects);
   if (!_oobgc.installed) install();
 
   if (!_oobgc.prev_allocated_object) {
@@ -135,11 +135,11 @@ oobgc(VALUE self)
     return Qtrue;
 
   } else if (_oobgc.allocation_limit) {
-    /* GC will be required when total_allocated_object gets
+    /* GC will be required when total_allocated_objects gets
      * close to allocation_limit
      */
-    if ((rb_gc_stat(sym_old_object) >= rb_gc_stat(sym_old_object_limit)*0.97 ||
-        rb_gc_stat(sym_remembered_shady_object) >= rb_gc_stat(sym_remembered_shady_object_limit)*0.97) &&
+    if ((rb_gc_stat(sym_old_objects) >= rb_gc_stat(sym_old_objects_limit)*0.97 ||
+        rb_gc_stat(sym_remembered_wb_unprotected_objects) >= rb_gc_stat(sym_remembered_wb_unprotected_objects_limit)*0.97) &&
         curr >= _oobgc.allocation_limit - _oobgc.threshold.max*0.98) {
       /*fprintf(stderr, "oobgc MAJOR: %zu >= %zu - %zu\n", curr, _oobgc.allocation_limit, _oobgc.threshold.max);*/
       gc_start_major();
@@ -191,17 +191,19 @@ Init_oobgc()
   rb_define_singleton_method(mOOB, "stat", oobgc_stat, 1);
   rb_define_singleton_method(mOOB, "clear", oobgc_clear, 0);
 
-#define S(name) sym_##name = ID2SYM(rb_intern(#name));
-  S(total_allocated_object);
-  S(heap_swept_slot);
-  S(heap_tomb_page_length);
-  S(heap_final_slot);
+#define S(name, legacy_name) sym_##name = ID2SYM(rb_intern(#legacy_name));
+  S(total_allocated_objects, total_allocated_object);
+  S(heap_swept_slots, heap_swept_slot);
+  S(heap_tomb_pages, heap_tomb_page_length);
+  S(heap_final_slots, heap_final_slot);
 
-  S(old_object);
-  S(old_object_limit);
-  S(remembered_shady_object);
-  S(remembered_shady_object_limit);
+  S(old_objects, old_object);
+  S(old_objects_limit, old_object_limit);
+  S(remembered_wb_unprotected_objects, remembered_shady_object);
+  S(remembered_wb_unprotected_objects_limit, remembered_shady_object_limit);
+#undef S
 
+#define S(name) sym_##name = ID2SYM(rb_intern(#name))
   S(major_by);
   S(count);
   S(major_count);
