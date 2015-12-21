@@ -1,7 +1,7 @@
-require 'test/unit'
+require 'minitest/autorun'
 require 'gctools/gcprof'
 
-class TestGCProf < Test::Unit::TestCase
+class TestGCProf < Minitest::Test
   def teardown
     GCProf.after_gc_hook = nil
   end
