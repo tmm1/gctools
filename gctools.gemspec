@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'gctools'
-  s.version = '0.2.3'
+  s.version = '0.2.4'
   s.summary = 'rgengc tools for ruby 2.1+'
   s.description = 'gc debugger, logger and profiler for rgengc in ruby 2.1'
 
